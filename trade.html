@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر RIVER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@400;700&family=Inter:wght@400;500;600;700&family=Parisienne&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #5d4037; /* Dark Chocolate */
+            --secondary-color: #8b5e3c; /* Caramel */
+            --accent-color: #d1b490; /* Cream */
+            --background-color: #f8f6f2; /* Light Beige */
+            --text-color: #3e2723; /* Very Dark Brown */
+        }
+        body {
+            font-family: 'Amiri', serif; /* Elegant Arabic font */
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            --primary-color: #f0ead2;
+            --secondary-color: #e5d5b7;
+            --accent-color: #8b5e3c;
+            --background-color: #1a1a1a;
+            --text-color: #f8f6f2;
+        }
+        .text-english {
+            font-family: 'Cormorant Garamond', serif; /* Elegant English font */
+        }
+        .text-parisienne {
+            font-family: 'Parisienne', cursive; /* French-style font */
+        }
+        .header-bg {
+            background-color: white;
+            transition: background-color 0.3s;
+        }
+        body.dark-mode .header-bg {
+            background-color: #2a2a2a;
+        }
+        .product-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 1.5rem;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode .product-card:hover {
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.1);
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+        .chat-bubble {
+            max-width: 80%;
+            border-radius: 1.5rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .user-bubble {
+            background-color: #bcaaa4; /* Light Brown */
+            color: white;
+            align-self: flex-start;
+        }
+        .bot-bubble {
+            background-color: #e8e2d8; /* Very Light Brown */
+            color: var(--text-color);
+            align-self: flex-end;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        .header-category-nav button {
+            transition: color 0.2s, transform 0.2s;
+        }
+        .header-category-nav button:hover {
+            color: var(--secondary-color);
+            transform: scale(1.1);
+        }
+        .icon-hover-effect {
+            transition: transform 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+        .icon-hover-effect:hover {
+            transform: scale(1.2);
+            color: var(--secondary-color);
+            box-shadow: 0 0 10px rgba(139, 94, 60, 0.5);
+            border-radius: 9999px;
+        }
+        .currency-select {
+            background-color: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-color);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .hero-section {
+            background-image: url('https://placehold.co/1200x600/8b5e3c/ffffff?text=A+River+of+Chocolate');
+            background-size: cover;
+            background-position: center;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 2rem;
+            border-radius: 1.5rem;
+        }
+        .hero-title {
+            font-size: 4rem;
+            line-height: 1.2;
+            text-align: center;
+        }
+        .account-dropdown-menu {
+            transition: opacity 0.2s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .account-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header -->
+    <header class="header-bg shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center relative">
+            <!-- Language and Currency -->
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <button id="lang-ar" class="text-lg font-bold text-gray-900 border-b-2 border-transparent hover:border-gray-900 transition-colors">عربي</button>
+                    <span class="text-gray-400">|</span>
+                    <button id="lang-en" class="text-lg font-bold text-gray-500 hover:text-gray-900 transition-colors">English</button>
+                </div>
+                <select id="currency-selector" class="currency-select text-gray-800 focus:ring-0">
+                    <option value="QAR">QAR</option>
+                    <option value="AED">AED</option>
+                    <option value="AUD">AUD</option>
+                    <option value="BDT">BDT</option>
+                    <option value="BHD">BHD</option>
+                    <option value="CAD">CAD</option>
+                    <option value="CNY">CNY</option>
+                    <option value="EGP">EGP</option>
+                    <option value="EUR">EUR</option>
+                </select>
+            </div>
+            
+            <!-- Logo -->
+            <div class="absolute left-1/2 -translate-x-1/2">
+                <a href="#" class="text-4xl font-bold text-english text-dark-chocolate">
+                    RIVER
+                </a>
+            </div>
+
+            <!-- Icons -->
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <div class="relative">
+                    <button id="account-btn" class="text-gray-600 hover:text-gray-900 transition-colors icon-hover-effect">
+                        <i class="fas fa-user-circle text-2xl"></i>
+                    </button>
+                    <!-- Account Dropdown Menu -->
+                    <div id="account-dropdown" class="account-dropdown-menu absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50 py-2 border border-gray-200">
+                        <!-- Content will be rendered by JS -->
+                    </div>
+                </div>
+                <button id="open-favorites-btn" class="relative text-gray-600 hover:text-gray-900 transition-colors icon-hover-effect">
+                    <i class="fas fa-heart text-2xl"></i>
+                    <span id="favorites-count" class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center -mt-1 -mr-2">0</span>
+                </button>
+                <button id="open-cart-btn" class="relative text-gray-600 hover:text-gray-900 transition-colors icon-hover-effect">
+                    <i class="fas fa-shopping-cart text-2xl"></i>
+                    <span id="cart-count" class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center -mt-1 -mr-2">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Home Section -->
+    <div id="home-page" class="container mx-auto px-6 hero-section">
+        <div>
+            <h1 class="hero-title text-english text-white font-bold mb-4">
+                <span class="text-parisienne">welcome to river, a river of choclate</span>
+            </h1>
+            <h1 class="hero-title text-amiri text-white font-bold">
+                اهلا بكم في متجرنا "ريفر", نهر من الشوكولاتة
+            </h1>
+        </div>
+    </div>
+
+    <!-- Product Categories Navigation -->
+    <nav class="header-category-nav bg-white shadow-sm py-3">
+        <div class="container mx-auto px-6 flex justify-center space-x-8 space-x-reverse text-xl font-bold">
+            <button data-category="all" class="text-gray-900 hover:text-secondary-color transition-colors duration-300">الكل</button>
+            <button data-category="cake" class="text-gray-500 hover:text-secondary-color transition-colors duration-300">كيك</button>
+            <button data-category="coffee" class="text-gray-500 hover:text-secondary-color transition-colors duration-300">كوفي</button>
+            <button data-category="petits-fours" class="text-gray-500 hover:text-secondary-color transition-colors duration-300">بتيفور</button>
+            <button data-category="chocolate" class="text-gray-500 hover:text-secondary-color transition-colors duration-300">شوكولاتة</button>
+            <button data-category="flowers" class="text-gray-500 hover:text-secondary-color transition-colors duration-300">زهور</button>
+        </div>
+    </nav>
+
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="container mx-auto px-6 py-12 hidden">
+        <h1 id="page-title" class="text-4xl font-extrabold text-center mb-12 text-gray-900">أحدث المنتجات</h1>
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Product cards will be inserted here by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Cart Page -->
+    <div id="cart-page" class="container mx-auto px-6 py-12 hidden">
+        <h1 class="text-4xl font-extrabold text-center mb-12 text-gray-900">عربة التسوق</h1>
+        <div id="cart-content" class="bg-white rounded-2xl shadow-xl p-8 flex flex-col lg:flex-row gap-8">
+            <div id="cart-items" class="flex-grow space-y-6">
+                <!-- Cart items will be inserted here by JavaScript -->
+            </div>
+            <div class="lg:w-1/3 p-6 bg-gray-50 rounded-xl shadow-inner">
+                <h2 id="cart-summary-title" class="text-2xl font-bold mb-4">ملخص الطلب</h2>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-600">المجموع الفرعي:</span>
+                    <span id="cart-subtotal" class="font-bold">0.00 ريال</span>
+                </div>
+                <div class="flex justify-between items-center text-xl font-extrabold mt-4 pt-4 border-t border-gray-200">
+                    <span>المجموع الكلي:</span>
+                    <span id="cart-total">0.00 ريال</span>
+                </div>
+                <button id="checkout-btn" class="mt-6 w-full btn-primary font-bold py-3 px-6 rounded-lg hover:bg-secondary-color transition-colors">
+                    إتمام عملية الشراء
+                </button>
+            </div>
+        </div>
+        <div id="empty-cart-message" class="text-center text-gray-500 text-xl hidden mt-8">
+            عربة التسوق فارغة.
+        </div>
+    </div>
+
+    <!-- Favorites Page -->
+    <div id="favorites-page" class="container mx-auto px-6 py-12 hidden">
+        <h1 class="text-4xl font-extrabold text-center mb-12 text-gray-900">قائمة الأمنيات</h1>
+        <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Favorite product cards will be inserted here -->
+        </div>
+        <div id="empty-favorites-message" class="text-center text-gray-500 text-xl hidden mt-8">
+            قائمة الأمنيات فارغة.
+        </div>
+    </div>
+
+    <!-- Checkout Page (Simulated) -->
+    <div id="checkout-page" class="container mx-auto px-6 py-12 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-auto p-8 transform scale-95 transition-transform">
+            <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">بيانات التوصيل والدفع</h2>
+            <form id="checkout-form">
+                <div class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل</label>
+                        <input type="text" id="name" name="name" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-color">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+                        <input type="email" id="email" name="email" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-color">
+                    </div>
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700 mb-1">العنوان</label>
+                        <textarea id="address" name="address" rows="3" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-color"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button type="submit" id="simulate-payment-btn" class="w-full btn-primary font-bold py-3 px-6 rounded-lg hover:bg-secondary-color transition-colors">
+                        الدفع الآن (محاكاة)
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Page -->
+    <div id="privacy-page" class="container mx-auto px-6 py-12 hidden">
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <h1 class="text-3xl font-bold mb-4">سياسة الخصوصية</h1>
+            <p class="mb-4">
+                نحن في متجر RIVER نولي خصوصيتك أهمية قصوى. تهدف هذه السياسة إلى توضيح كيفية جمع واستخدام وحماية معلوماتك الشخصية عند استخدامك لمتجرنا.
+            </p>
+            <h2 class="text-2xl font-bold mb-2">1. المعلومات التي نجمعها</h2>
+            <p class="mb-4">
+                قد نجمع معلومات شخصية مثل اسمك، بريدك الإلكتروني، وعنوانك عند تسجيل حساب أو إتمام طلب.
+            </p>
+            <h2 class="text-2xl font-bold mb-2">2. كيفية استخدام المعلومات</h2>
+            <p class="mb-4">
+                نستخدم معلوماتك لمعالجة طلباتك، تحسين تجربتك في الموقع، وإرسال إشعارات هامة (في حالة موافقتك).
+            </p>
+            <h2 class="text-2xl font-bold mb-2">3. حماية المعلومات</h2>
+            <p>
+                نلتزم باتخاذ كافة الإجراءات الأمنية اللازمة لحماية بياناتك من الوصول غير المصرح به أو الكشف عنها.
+            </p>
+        </div>
+    </div>
+
+    <!-- Terms & Conditions Page -->
+    <div id="terms-page" class="container mx-auto px-6 py-12 hidden">
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <h1 class="text-3xl font-bold mb-4">الشروط والأحكام</h1>
+            <p class="mb-4">
+                مرحباً بك في متجر RIVER. يرجى قراءة هذه الشروط والأحكام بعناية قبل استخدام موقعنا. باستخدامك للموقع، فإنك توافق على الالتزام بهذه الشروط.
+            </p>
+            <h2 class="text-2xl font-bold mb-2">1. استخدام الموقع</h2>
+            <p class="mb-4">
+                يسمح لك باستخدام الموقع لأغراض شخصية وغير تجارية فقط. يحظر نسخ أو تعديل أو توزيع محتوى الموقع دون إذن كتابي مسبق.
+            </p>
+            <h2 class="text-2xl font-bold mb-2">2. الطلبات والدفع</h2>
+            <p class="mb-4">
+                جميع الطلبات تخضع للتوفر. يتم تحديد الأسعار المعروضة في الموقع. نحن نحتفظ بالحق في تعديل الأسعار أو رفض أي طلب.
+            </p>
+            <h2 class="text-2xl font-bold mb-2">3. سياسة الإرجاع</h2>
+            <p>
+                نظراً لطبيعة منتجاتنا، فإننا لا نقبل إرجاع الحلويات إلا في حالة وصولها تالفة. يرجى التواصل معنا في حال وجود أي مشكلة.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Contact Page -->
+    <div id="contact-page" class="container mx-auto px-6 py-12 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-auto p-8 transform scale-95 transition-transform">
+            <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">تواصل معنا</h2>
+            <form>
+                <div class="space-y-4">
+                    <div>
+                        <label for="contact-name" class="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل</label>
+                        <input type="text" id="contact-name" name="contact-name" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-color">
+                    </div>
+                    <div>
+                        <label for="contact-email" class="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+                        <input type="email" id="contact-email" name="contact-email" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-color">
+                    </div>
+                    <div>
+                        <label for="contact-message" class="block text-sm font-medium text-gray-700 mb-1">رسالتك</label>
+                        <textarea id="contact-message" name="contact-message" rows="5" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-color"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button type="submit" class="w-full btn-primary font-bold py-3 px-6 rounded-lg hover:bg-secondary-color transition-colors">
+                        إرسال الرسالة
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-8 transform scale-95 transition-transform">
+            <div class="flex justify-between items-start mb-4">
+                <h2 id="modal-product-name" class="text-2xl font-bold text-gray-900"></h2>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <img id="modal-product-image" src="" alt="صورة المنتج" class="rounded-xl w-full h-64 object-cover">
+                <div>
+                    <p id="modal-product-description" class="text-gray-600 mb-4"></p>
+                    <div class="flex items-center justify-between mb-4">
+                        <span id="modal-product-price" class="text-3xl font-bold text-secondary-color"></span>
+                        <span class="text-gray-500">ريال</span>
+                    </div>
+                    <div class="flex space-x-2 space-x-reverse">
+                        <button id="add-to-cart-btn" class="w-full btn-primary font-bold py-3 px-6 rounded-lg hover:bg-secondary-color transition-colors">
+                            أضف إلى السلة
+                        </button>
+                        <button id="add-to-favorites-btn" class="p-3 rounded-lg border-2 border-gray-300 text-gray-600 hover:text-red-500 hover:border-red-500 transition-colors">
+                            <i class="fas fa-heart text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center">
+            <div class="text-green-500 text-6xl mb-4">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">تم استلام طلبك بنجاح!</h2>
+            <p class="text-gray-600 mb-4">تم حفظ طلبك في قاعدة البيانات برقم:</p>
+            <p id="order-id-display" class="text-xl font-bold text-gray-800 mb-4"></p>
+            <p class="text-sm text-gray-500">سيتم إرسال تأكيد الطلب إلى بريدك الإلكتروني.</p>
+            <button id="close-success-modal-btn" class="mt-6 btn-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-secondary-color transition-colors">
+                إغلاق
+            </button>
+        </div>
+    </div>
+    
+    <!-- Failure Modal -->
+    <div id="failure-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center">
+            <div class="text-red-500 text-6xl mb-4">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">فشلت عملية الدفع!</h2>
+            <p class="text-gray-600">عذراً، حدث خطأ أثناء معالجة دفعتك. يرجى المحاولة مرة أخرى أو استخدام طريقة دفع أخرى.</p>
+            <button id="close-failure-modal-btn" class="mt-6 btn-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-secondary-color transition-colors">
+                إغلاق
+            </button>
+        </div>
+    </div>
+
+    <!-- Info Modal (used to replace alert() messages) -->
+    <div id="info-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center">
+            <h2 id="info-modal-title" class="text-2xl font-bold text-gray-900 mb-2"></h2>
+            <p id="info-modal-message" class="text-gray-600 mb-4"></p>
+            <button id="close-info-modal-btn" class="mt-6 btn-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-secondary-color transition-colors">
+                إغلاق
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Chat Button -->
+    <button id="open-chat-btn" class="fixed bottom-6 left-6 bg-primary-color text-white rounded-full p-4 shadow-lg hover:bg-secondary-color transition-colors z-50">
+        <i class="fas fa-comment-dots text-2xl"></i>
+    </button>
+
+    <!-- Chat Modal -->
+    <div id="chat-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl h-full max-h-[80vh] p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">مساعد "RIVER" الودود ✨</h2>
+                <button id="close-chat-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div id="chat-messages" class="flex-grow overflow-y-auto p-4 bg-gray-100 rounded-lg flex flex-col-reverse space-y-2 mb-4">
+                <!-- Chat messages will appear here -->
+            </div>
+            <form id="chat-form" class="flex space-x-2 space-x-reverse">
+                <input type="text" id="chat-input" placeholder="كيف يمكنني مساعدتك؟" class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color">
+                <button type="submit" class="bg-primary-color text-white font-bold py-3 px-6 rounded-lg hover:bg-secondary-color transition-colors">
+                    إرسال
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-12 mt-12">
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-right">
+            <div>
+                <h3 class="text-xl font-bold mb-4">عن RIVER</h3>
+                <p class="text-sm">
+                    نحن نقدم أفخر أنواع الشوكولاتة والحلويات الطازجة المصنوعة بحب وعناية. اكتشف مجموعتنا الفريدة واستمتع بتجربة لا تُنسى.
+                </p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">روابط سريعة</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" id="footer-contact-link" class="hover:text-white transition-colors">تواصل معنا</a></li>
+                    <li><a href="#" id="footer-privacy-link" class="hover:text-white transition-colors">سياسة الخصوصية</a></li>
+                    <li><a href="#" id="footer-terms-link" class="hover:text-white transition-colors">الشروط والأحكام</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">تواصل معنا</h3>
+                <p class="text-sm mb-2">البريد الإلكتروني: info@river-sweets.com</p>
+                <p class="text-sm mb-2">الهاتف: 966-123-4567+</p>
+                <div class="flex justify-center md:justify-end space-x-4 space-x-reverse mt-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-facebook-f text-xl"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-instagram text-xl"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-twitter text-xl"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-sm text-gray-500 mt-8">
+            &copy; 2024 RIVER. جميع الحقوق محفوظة.
+        </div>
+    </footer>
+
+
+    <script type="module">
+        // استيراد Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // متغيرات Firebase العامة
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // تهيئة Firebase
+        let app, db, auth;
+        if (Object.keys(firebaseConfig).length > 0) {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } else {
+            console.error("Firebase configuration is not provided.");
+        }
+        let isAuthReady = false;
+        let userId = null;
+        let loggedIn = false; // Added state to simulate login status
+        
+        // الدخول إلى Firebase
+        async function signIn() {
+            if (!auth) return;
+            try {
+                if (initialAuthToken) {
+                    const userCredential = await signInWithCustomToken(auth, initialAuthToken);
+                    userId = userCredential.user.uid;
+                } else {
+                    const userCredential = await signInAnonymously(auth);
+                    userId = userCredential.user.uid;
+                }
+                isAuthReady = true;
+                loggedIn = true; // Simulate successful login
+                console.log("Firebase signed in successfully. User ID:", userId);
+            } catch (error) {
+                console.error("Firebase sign-in failed:", error);
+            }
+        }
+        
+        // Product Data
+        const products = [
+            { id: 1, name: 'شوكولاتة داكنة غنية', name_en: 'Rich Dark Chocolate', description: 'شوكولاتة داكنة فاخرة بنسبة 70% كاكاو، مثالية لعشاق الطعم القوي.', description_en: 'Luxurious dark chocolate with 70% cocoa, perfect for lovers of intense flavor.', price: 55, image: 'https://placehold.co/400x300/5d4037/ffffff?text=Dark+Chocolate', category: 'chocolate' },
+            { id: 2, name: 'كيك الشوكولاتة الذائب', name_en: 'Molten Chocolate Cake', description: 'كيك دافئ وناعم مع مركز شوكولاتة ذائبة. تجربة لا تُنسى.', description_en: 'A warm and soft cake with a molten chocolate center. An unforgettable experience.', price: 85, image: 'https://placehold.co/400x300/8b5e3c/ffffff?text=Chocolate+Cake', category: 'cake' },
+            { id: 3, name: 'كوفي لاتيه بلمسة كراميل', name_en: 'Caramel Latte', description: 'قهوة لاتيه غنية مع حليب مبخر ولمسة من الكراميل. طعم يدغدغ الحواس.', description_en: 'A rich latte with steamed milk and a touch of caramel. A delightful sensory experience.', price: 25, image: 'https://placehold.co/400x300/d1b490/ffffff?text=Caramel+Latte', category: 'coffee' },
+            { id: 4, name: 'بتيفور باللوز', name_en: 'Almond Petits Fours', description: 'قطع صغيرة من البتيفور الهش مع حشوة لوز لذيذة.', description_en: 'Small, crispy petits fours with a delicious almond filling.', price: 40, image: 'https://placehold.co/400x300/3e2723/ffffff?text=Almond+Petits', category: 'petits-fours' },
+            { id: 5, name: 'مزيج شوكولاتة بالحليب', name_en: 'Milk Chocolate Mix', description: 'تشكيلة رائعة من قطع الشوكولاتة بالحليب، مثالية للمشاركة.', description_en: 'A wonderful assortment of milk chocolate pieces, perfect for sharing.', price: 60, image: 'https://placehold.co/400x300/a1887f/ffffff?text=Milk+Chocolate+Mix', category: 'chocolate' },
+            { id: 6, name: 'كيك التوت البري', name_en: 'Wild Berry Cake', description: 'كيك خفيف ومنعش مع طبقة كريمة وتوت بري طازج.', description_en: 'A light and refreshing cake with a cream layer and fresh wild berries.', price: 95, image: 'https://placehold.co/400x300/8c728e/ffffff?text=Berry+Cake', category: 'cake' },
+            { id: 7, name: 'قهوة اسبريسو خاصة', name_en: 'Specialty Espresso', description: 'حبوب قهوة مختارة بعناية لتحضير اسبريسو قوي وغني.', description_en: 'Carefully selected coffee beans for a strong and rich espresso.', price: 30, image: 'https://placehold.co/400x300/3c2f2f/ffffff?text=Espresso', category: 'coffee' },
+            { id: 8, name: 'بتيفور بالكريمة', name_en: 'Cream Petits Fours', description: 'بتيفور ناعم بحشوة كريمة فانيلا، يذوب في الفم.', description_en: 'Soft petits fours with a vanilla cream filling that melts in your mouth.', price: 45, image: 'https://placehold.co/400x300/d7ccc8/ffffff?text=Cream+Petits', category: 'petits-fours' },
+            { id: 9, name: 'قطع شوكولاتة بيضاء', name_en: 'White Chocolate Pieces', description: 'شوكولاتة بيضاء ناعمة وكريمية، بلمسة من الفانيلا.', description_en: 'Smooth and creamy white chocolate with a hint of vanilla.', price: 50, image: 'https://placehold.co/400x300/d8c1a7/ffffff?text=White+Chocolate', category: 'chocolate' },
+            // إضافة منتجات فئة الزهور
+            { id: 10, name: 'باقة توليب حمراء', name_en: 'Red Tulip Bouquet', description: 'باقة من زهور التوليب الحمراء النابضة بالحياة، مثالية للمناسبات الخاصة.', description_en: 'A vibrant bouquet of red tulips, perfect for special occasions.', price: 150, image: 'https://placehold.co/400x300/e9a3b6/ffffff?text=Red+Tulips', category: 'flowers' },
+            { id: 11, name: 'زهور الليليوم الوردية', name_en: 'Pink Lily Flowers', description: 'باقة أنيقة من زهور الليليوم الوردية، تضيف لمسة من الرقي.', description_en: 'An elegant bouquet of pink lilies, adding a touch of sophistication.', price: 120, image: 'https://placehold.co/400x300/c7a5c7/ffffff?text=Pink+Lilies', category: 'flowers' },
+            { id: 12, name: 'باقة دوار الشمس', name_en: 'Sunflower Bouquet', description: 'باقة مشرقة ومبهجة من زهور دوار الشمس، تجلب السعادة إلى أي مكان.', description_en: 'A bright and cheerful bouquet of sunflowers, bringing happiness to any space.', price: 110, image: 'https://placehold.co/400x300/ffc107/ffffff?text=Sunflowers', category: 'flowers' }
+        ];
+
+        // Global state and DOM elements
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        let currentLang = 'ar';
+        let currentPage = 'home-page';
+        const pages = ['home-page', 'main-content', 'cart-page', 'favorites-page', 'checkout-page', 'privacy-page', 'terms-page', 'contact-page'];
+        
+        // UI Language translations
+        const translations = {
+            'ar': {
+                'page-title': 'أحدث المنتجات',
+                'home-title-en': 'welcome to river, a river of choclate',
+                'home-title-ar': 'اهلا بكم في متجرنا "ريفر", نهر من الشوكولاتة',
+                'nav-all': 'الكل',
+                'nav-cake': 'كيك',
+                'nav-coffee': 'كوفي',
+                'nav-petits-fours': 'بتيفور',
+                'nav-chocolate': 'شوكولاتة',
+                'nav-flowers': 'زهور',
+                'modal-add-to-cart': 'أضف إلى السلة',
+                'cart-page-title': 'عربة التسوق',
+                'cart-summary-title': 'ملخص الطلب',
+                'cart-subtotal': 'المجموع الفرعي:',
+                'cart-total': 'المجموع الكلي:',
+                'checkout-btn': 'إتمام عملية الشراء',
+                'empty-cart-message': 'عربة التسوق فارغة.',
+                'favorites-page-title': 'قائمة الأمنيات',
+                'empty-favorites-message': 'قائمة الأمنيات فارغة.',
+                'checkout-page-title': 'بيانات التوصيل والدفع',
+                'checkout-name': 'الاسم الكامل',
+                'checkout-email': 'البريد الإلكتروني',
+                'checkout-address': 'العنوان',
+                'simulate-payment-btn': 'الدفع الآن (محاكاة)',
+                'success-title': 'تم استلام طلبك بنجاح!',
+                'success-message': 'تم حفظ طلبك في قاعدة البيانات برقم:',
+                'success-email-note': 'سيتم إرسال تأكيد الطلب إلى بريدك الإلكتروني.',
+                'failure-title': 'فشلت عملية الدفع!',
+                'failure-message': 'عذراً، حدث خطأ أثناء معالجة دفعتك. يرجى المحاولة مرة أخرى أو استخدام طريقة دفع أخرى.',
+                'modal-close': 'إغلاق',
+                'chat-title': 'مساعد "RIVER" الودود ✨',
+                'chat-placeholder': 'كيف يمكنني مساعدتك؟',
+                'chat-send': 'إرسال',
+                'product-price': 'ريال',
+                'product-add-to-cart': 'أضف إلى السلة',
+                'product-remove': 'إزالة',
+                'info-title': 'تنبيه',
+                'info-empty-cart': 'عربة التسوق فارغة.',
+                'account-login': 'تسجيل الدخول',
+                'account-signup': 'إنشاء حساب',
+                'account-profile': 'إدارة الحساب',
+                'account-logout': 'تسجيل الخروج',
+                'account-delivery': 'عنوان التوصيل',
+                'account-theme': 'الوضع الداكن/الفاتح',
+                'footer-contact': 'تواصل معنا',
+                'footer-about': 'عن RIVER',
+                'footer-quick-links': 'روابط سريعة',
+                'footer-privacy': 'سياسة الخصوصية',
+                'footer-terms': 'الشروط والأحكام'
+            },
+            'en': {
+                'page-title': 'Latest Products',
+                'home-title-en': 'welcome to river, a river of choclate',
+                'home-title-ar': 'Welcome to our store "River", a river of chocolate',
+                'nav-all': 'All',
+                'nav-cake': 'Cake',
+                'nav-coffee': 'Coffee',
+                'nav-petits-fours': 'Petits Fours',
+                'nav-chocolate': 'Chocolate',
+                'nav-flowers': 'Flowers',
+                'modal-add-to-cart': 'Add to Cart',
+                'cart-page-title': 'Shopping Cart',
+                'cart-summary-title': 'Order Summary',
+                'cart-subtotal': 'Subtotal:',
+                'cart-total': 'Total:',
+                'checkout-btn': 'Proceed to Checkout',
+                'empty-cart-message': 'Your cart is empty.',
+                'favorites-page-title': 'Wishlist',
+                'empty-favorites-message': 'Your wishlist is empty.',
+                'checkout-page-title': 'Delivery & Payment Details',
+                'checkout-name': 'Full Name',
+                'checkout-email': 'Email Address',
+                'checkout-address': 'Address',
+                'simulate-payment-btn': 'Pay Now (Simulated)',
+                'success-title': 'Your order has been received successfully!',
+                'success-message': 'Your order has been saved with the ID:',
+                'success-email-note': 'An order confirmation will be sent to your email.',
+                'failure-title': 'Payment Failed!',
+                'failure-message': 'Sorry, an error occurred while processing your payment. Please try again or use another payment method.',
+                'modal-close': 'Close',
+                'chat-title': 'The Friendly "RIVER" Assistant ✨',
+                'chat-placeholder': 'How can I help you?',
+                'chat-send': 'Send',
+                'product-price': 'SAR',
+                'product-add-to-cart': 'Add to Cart',
+                'product-remove': 'Remove',
+                'info-title': 'Alert',
+                'info-empty-cart': 'Your cart is empty.',
+                'account-login': 'Login',
+                'account-signup': 'Sign Up',
+                'account-profile': 'Account Management',
+                'account-logout': 'Logout',
+                'account-delivery': 'Delivery Address',
+                'account-theme': 'Dark/Light Mode',
+                'footer-contact': 'Contact Us',
+                'footer-about': 'About RIVER',
+                'footer-quick-links': 'Quick Links',
+                'footer-privacy': 'Privacy Policy',
+                'footer-terms': 'Terms & Conditions'
+            }
+        };
+
+        // Function to update all text based on language
+        function updateUI(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            const isRTL = lang === 'ar';
+            document.documentElement.setAttribute('lang', lang);
+            document.documentElement.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+            document.body.classList.toggle('text-english', !isRTL);
+
+            // Update language switcher buttons
+            const langArBtn = document.getElementById('lang-ar');
+            const langEnBtn = document.getElementById('lang-en');
+            if (langArBtn) {
+                langArBtn.textContent = 'عربي';
+                langArBtn.classList.toggle('text-gray-900', isRTL);
+                langArBtn.classList.toggle('border-b-2', isRTL);
+            }
+            if (langEnBtn) {
+                langEnBtn.textContent = 'English';
+                langEnBtn.classList.toggle('text-gray-900', !isRTL);
+                langEnBtn.classList.toggle('border-b-2', !isRTL);
+            }
+
+            // Update category nav
+            const navAllBtn = document.querySelector('.header-category-nav button[data-category="all"]');
+            if(navAllBtn) navAllBtn.textContent = t['nav-all'];
+            const navCakeBtn = document.querySelector('.header-category-nav button[data-category="cake"]');
+            if(navCakeBtn) navCakeBtn.textContent = t['nav-cake'];
+            const navCoffeeBtn = document.querySelector('.header-category-nav button[data-category="coffee"]');
+            if(navCoffeeBtn) navCoffeeBtn.textContent = t['nav-coffee'];
+            const navPetitsFoursBtn = document.querySelector('.header-category-nav button[data-category="petits-fours"]');
+            if(navPetitsFoursBtn) navPetitsFoursBtn.textContent = t['nav-petits-fours'];
+            const navChocolateBtn = document.querySelector('.header-category-nav button[data-category="chocolate"]');
+            if(navChocolateBtn) navChocolateBtn.textContent = t['nav-chocolate'];
+            const navFlowersBtn = document.querySelector('.header-category-nav button[data-category="flowers"]');
+            if(navFlowersBtn) navFlowersBtn.textContent = t['nav-flowers'];
+
+
+            // Update home page text
+            const homeTitleEn = document.querySelector('#home-page .text-parisienne');
+            if(homeTitleEn) homeTitleEn.textContent = t['home-title-en'];
+            const homeTitleAr = document.querySelector('#home-page .text-amiri');
+            if(homeTitleAr) homeTitleAr.textContent = t['home-title-ar'];
+
+            // Update modals and pages
+            const pageTitle = document.getElementById('page-title');
+            if(pageTitle) pageTitle.textContent = t['page-title'];
+
+            const cartPageTitle = document.querySelector('#cart-page h1');
+            if(cartPageTitle) cartPageTitle.textContent = t['cart-page-title'];
+            const cartSummaryTitle = document.getElementById('cart-summary-title');
+            if(cartSummaryTitle) cartSummaryTitle.textContent = t['cart-summary-title'];
+            const cartSubtotalLabel = document.getElementById('cart-subtotal')?.previousElementSibling;
+            if(cartSubtotalLabel) cartSubtotalLabel.textContent = t['cart-subtotal'];
+            const cartTotalLabel = document.getElementById('cart-total')?.previousElementSibling;
+            if(cartTotalLabel) cartTotalLabel.textContent = t['cart-total'];
+            const checkoutBtn = document.getElementById('checkout-btn');
+            if(checkoutBtn) checkoutBtn.textContent = t['checkout-btn'];
+            const emptyCartMessage = document.getElementById('empty-cart-message');
+            if(emptyCartMessage) emptyCartMessage.textContent = t['empty-cart-message'];
+            const favoritesPageTitle = document.querySelector('#favorites-page h1');
+            if(favoritesPageTitle) favoritesPageTitle.textContent = t['favorites-page-title'];
+            const emptyFavoritesMessage = document.getElementById('empty-favorites-message');
+            if(emptyFavoritesMessage) emptyFavoritesMessage.textContent = t['empty-favorites-message'];
+            const checkoutPageTitle = document.querySelector('#checkout-page h2');
+            if(checkoutPageTitle) checkoutPageTitle.textContent = t['checkout-page-title'];
+            const checkoutNameLabel = document.querySelector('#checkout-form label[for="name"]');
+            if(checkoutNameLabel) checkoutNameLabel.textContent = t['checkout-name'];
+            const checkoutEmailLabel = document.querySelector('#checkout-form label[for="email"]');
+            if(checkoutEmailLabel) checkoutEmailLabel.textContent = t['checkout-email'];
+            const checkoutAddressLabel = document.querySelector('#checkout-form label[for="address"]');
+            if(checkoutAddressLabel) checkoutAddressLabel.textContent = t['checkout-address'];
+            const simulatePaymentBtn = document.getElementById('simulate-payment-btn');
+            if(simulatePaymentBtn) simulatePaymentBtn.textContent = t['simulate-payment-btn'];
+            
+            const successModalTitle = document.querySelector('#success-modal h2');
+            if(successModalTitle) successModalTitle.textContent = t['success-title'];
+            const successMessageP1 = document.querySelector('#success-modal p:nth-of-type(1)');
+            if(successMessageP1) successMessageP1.textContent = t['success-message'];
+            const successMessageP2 = document.querySelector('#success-modal p:nth-of-type(2)');
+            if(successMessageP2) successMessageP2.textContent = t['success-email-note'];
+            const failureModalTitle = document.querySelector('#failure-modal h2');
+            if(failureModalTitle) failureModalTitle.textContent = t['failure-title'];
+            const failureMessageP1 = document.querySelector('#failure-modal p:nth-of-type(1)');
+            if(failureMessageP1) failureMessageP1.textContent = t['failure-message'];
+            const closeSuccessModalBtn = document.getElementById('close-success-modal-btn');
+            if(closeSuccessModalBtn) closeSuccessModalBtn.textContent = t['modal-close'];
+            const closeFailureModalBtn = document.getElementById('close-failure-modal-btn');
+            if(closeFailureModalBtn) closeFailureModalBtn.textContent = t['modal-close'];
+            
+            const chatModalTitle = document.querySelector('#chat-modal h2');
+            if(chatModalTitle) chatModalTitle.textContent = t['chat-title'];
+            const chatInput = document.getElementById('chat-input');
+            if(chatInput) chatInput.placeholder = t['chat-placeholder'];
+            const chatSendBtn = document.querySelector('#chat-form button');
+            if(chatSendBtn) chatSendBtn.textContent = t['chat-send'];
+
+            // Update footer links
+            const footerAbout = document.querySelector('#footer-about');
+            if(footerAbout) footerAbout.textContent = t['footer-about'];
+            const footerQuickLinks = document.querySelector('#footer-quick-links');
+            if(footerQuickLinks) footerQuickLinks.textContent = t['footer-quick-links'];
+            const footerContactLink = document.getElementById('footer-contact-link');
+            if(footerContactLink) footerContactLink.textContent = t['footer-contact'];
+            const footerPrivacyLink = document.getElementById('footer-privacy-link');
+            if(footerPrivacyLink) footerPrivacyLink.textContent = t['footer-privacy'];
+            const footerTermsLink = document.getElementById('footer-terms-link');
+            if(footerTermsLink) footerTermsLink.textContent = t['footer-terms'];
+            
+            // Re-render product grids and cart
+            renderProducts();
+            renderCart();
+            renderFavorites();
+            renderAccountDropdown();
+        }
+
+        // Function to switch between pages
+        function navigateTo(pageId) {
+            pages.forEach(page => {
+                const element = document.getElementById(page);
+                if (!element) return; // Add a safety check for the element
+                if (page === pageId) {
+                    element.classList.remove('hidden');
+                    element.classList.add('block');
+                    currentPage = pageId;
+                } else {
+                    element.classList.add('hidden');
+                    element.classList.remove('block');
+                }
+            });
+            // Reset category button styling on page change
+            document.querySelectorAll('.header-category-nav button').forEach(btn => {
+                btn.classList.remove('text-gray-900', 'border-b-2');
+                btn.classList.add('text-gray-500');
+            });
+        }
+
+        // Function to render product cards
+        function renderProducts(category = 'all') {
+            const productsToRender = category === 'all' ? products : products.filter(p => p.category === category);
+            const productGrid = document.getElementById('product-grid');
+            if (!productGrid) return; // Add a safety check
+            productGrid.innerHTML = '';
+            productsToRender.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-md overflow-hidden product-card cursor-pointer';
+                card.innerHTML = `
+                    <img src="${product.image}" alt="${product[ `name_${currentLang}` ] || product.name}" class="w-full h-64 object-cover">
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold mb-2 text-gray-900">${product[ `name_${currentLang}` ] || product.name}</h3>
+                        <p class="text-2xl font-bold text-secondary-color">${product.price.toFixed(2)} ${translations[currentLang]['product-price']}</p>
+                    </div>
+                `;
+                card.addEventListener('click', () => showProductModal(product));
+                productGrid.appendChild(card);
+            });
+        }
+
+        // Function to show product modal
+        function showProductModal(product) {
+            const productModal = document.getElementById('product-modal');
+            const modalProductDescription = document.getElementById('modal-product-description');
+            if (!productModal || !modalProductDescription) return; // Add a safety check
+            
+            const modalProductName = document.getElementById('modal-product-name');
+            if (modalProductName) modalProductName.textContent = product[ `name_${currentLang}` ] || product.name;
+            const modalProductImage = document.getElementById('modal-product-image');
+            if (modalProductImage) {
+                modalProductImage.src = product.image;
+                modalProductImage.alt = product[ `name_${currentLang}` ] || product.name;
+            }
+            if (modalProductDescription) modalProductDescription.textContent = product[ `description_${currentLang}` ] || product.description;
+            const modalProductPrice = document.getElementById('modal-product-price');
+            if (modalProductPrice) modalProductPrice.textContent = product.price.toFixed(2);
+            if (modalProductPrice?.nextElementSibling) modalProductPrice.nextElementSibling.textContent = translations[currentLang]['product-price'];
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            if (addToCartBtn) {
+                addToCartBtn.textContent = translations[currentLang]['modal-add-to-cart'];
+                addToCartBtn.setAttribute('data-product-id', product.id);
+            }
+            const addToFavoritesBtn = document.getElementById('add-to-favorites-btn');
+            if (addToFavoritesBtn) addToFavoritesBtn.setAttribute('data-product-id', product.id);
+            
+            productModal.classList.remove('hidden');
+            productModal.classList.add('flex');
+        }
+
+        // Function to update cart UI
+        function renderCart() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartTotalSpan = document.getElementById('cart-total');
+            const cartCountSpan = document.getElementById('cart-count');
+            if (!cartItemsContainer || !cartTotalSpan || !cartCountSpan) return; // Add a safety check
+
+            cartItemsContainer.innerHTML = '';
+            let total = 0;
+            const itemCounts = {};
+
+            cart.forEach(item => {
+                itemCounts[item.id] = (itemCounts[item.id] || 0) + 1;
+            });
+
+            const uniqueCartItems = Object.keys(itemCounts).map(id => {
+                const product = products.find(p => p.id === parseInt(id));
+                return {
+                    ...product,
+                    quantity: itemCounts[id]
+                };
+            });
+
+            const cartContent = document.getElementById('cart-content');
+            const emptyCartMessage = document.getElementById('empty-cart-message');
+            if (cartContent && emptyCartMessage) {
+                if (uniqueCartItems.length === 0) {
+                    cartContent.classList.add('hidden');
+                    emptyCartMessage.classList.remove('hidden');
+                } else {
+                    cartContent.classList.remove('hidden');
+                    emptyCartMessage.classList.add('hidden');
+                }
+            }
+
+
+            uniqueCartItems.forEach(item => {
+                total += item.price * item.quantity;
+                const cartItemElement = document.createElement('div');
+                cartItemElement.className = 'flex items-center space-x-4 space-x-reverse border-b border-gray-200 pb-4';
+                cartItemElement.innerHTML = `
+                    <img src="${item.image}" alt="${item[ `name_${currentLang}` ] || item.name}" class="w-20 h-20 object-cover rounded-lg">
+                    <div class="flex-grow">
+                        <h4 class="font-bold text-gray-900">${item[ `name_${currentLang}` ] || item.name}</h4>
+                        <p class="text-gray-600">${item.price.toFixed(2)} ${translations[currentLang]['product-price']}</p>
+                    </div>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <button class="quantity-btn text-gray-600 hover:text-secondary-color text-2xl" data-action="decrease" data-product-id="${item.id}">-</button>
+                        <span class="font-bold text-lg">${item.quantity}</span>
+                        <button class="quantity-btn text-gray-600 hover:text-secondary-color text-2xl" data-action="increase" data-product-id="${item.id}">+</button>
+                    </div>
+                    <button class="remove-from-cart-btn text-red-500 hover:text-red-700 transition-colors" data-product-id="${item.id}">
+                        ${translations[currentLang]['product-remove']}
+                    </button>
+                `;
+                cartItemsContainer.appendChild(cartItemElement);
+            });
+
+            const subtotal = total;
+            const tax = total * 0.15; // 15% Tax (example)
+            const shipping = 20; // Fixed shipping cost
+            const finalTotal = subtotal + tax + shipping;
+
+            const cartSubtotal = document.getElementById('cart-subtotal');
+            if (cartSubtotal) cartSubtotal.textContent = `${subtotal.toFixed(2)} ${translations[currentLang]['product-price']}`;
+            if (cartTotalSpan) cartTotalSpan.textContent = `${finalTotal.toFixed(2)} ${translations[currentLang]['product-price']}`;
+            if (cartCountSpan) cartCountSpan.textContent = cart.length;
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+
+            // Add event listeners for cart buttons
+            document.querySelectorAll('.remove-from-cart-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.target.dataset.productId);
+                    const index = cart.findIndex(item => item.id === productId);
+                    if (index > -1) {
+                        cart.splice(index, 1);
+                        renderCart();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.quantity-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.target.dataset.productId);
+                    const action = e.target.dataset.action;
+                    if (action === 'increase') {
+                        const product = products.find(p => p.id === productId);
+                        cart.push(product);
+                    } else if (action === 'decrease') {
+                        const index = cart.findIndex(item => item.id === productId);
+                        if (index > -1) {
+                            cart.splice(index, 1);
+                        }
+                    }
+                    renderCart();
+                });
+            });
+        }
+        
+        // Function to render favorites page
+        function renderFavorites() {
+            const favoritesGrid = document.getElementById('favorites-grid');
+            const favoritesCountSpan = document.getElementById('favorites-count');
+            if (!favoritesGrid || !favoritesCountSpan) return; // Add a safety check
+
+            favoritesGrid.innerHTML = '';
+
+            const emptyFavoritesMessage = document.getElementById('empty-favorites-message');
+            if (emptyFavoritesMessage) {
+                if (favorites.length === 0) {
+                    emptyFavoritesMessage.classList.remove('hidden');
+                } else {
+                    emptyFavoritesMessage.classList.add('hidden');
+                }
+            }
+
+
+            favorites.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-md overflow-hidden product-card cursor-pointer';
+                card.innerHTML = `
+                    <img src="${product.image}" alt="${product[ `name_${currentLang}` ] || product.name}" class="w-full h-64 object-cover">
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold mb-2 text-gray-900">${product[ `name_${currentLang}` ] || product.name}</h3>
+                        <p class="text-2xl font-bold text-secondary-color">${product.price.toFixed(2)} ${translations[currentLang]['product-price']}</p>
+                        <button class="remove-from-favorites-btn mt-4 w-full bg-red-500 text-white font-bold py-2 rounded-lg hover:bg-red-600 transition-colors" data-product-id="${product.id}">
+                            ${translations[currentLang]['product-remove']}
+                        </button>
+                    </div>
+                `;
+                card.addEventListener('click', () => showProductModal(product));
+                favoritesGrid.appendChild(card);
+            });
+            if (favoritesCountSpan) favoritesCountSpan.textContent = favorites.length;
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+
+            document.querySelectorAll('.remove-from-favorites-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const productId = parseInt(e.target.dataset.productId);
+                    favorites = favorites.filter(item => item.id !== productId);
+                    renderFavorites();
+                });
+            });
+        }
+
+        // Function to handle the Gemini API call for chat
+        async function handleChat(userMessage) {
+            const botPersona = {
+                ar: `أنت مساعد متجر RIVER للحلويات. مهمتك هي الإجابة على أسئلة العملاء بطريقة ودية ومفيدة. يمكنك الإجابة عن المنتجات، المكونات، الأسعار، أو أي شيء يتعلق بالمتجر. لا تخرج عن هذا الدور.`,
+                en: `You are the friendly assistant for the RIVER sweets shop. Your job is to answer customer questions in a friendly and helpful manner. You can answer about products, ingredients, prices, or anything related to the store. Do not go outside this role.`
+            };
+            
+            const chatHistory = [];
+            
+            const prompt = `${botPersona[currentLang]} \n\nالعميل: ${userMessage}`;
+            
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+            const chatMessagesContainer = document.getElementById('chat-messages');
+            if (!chatMessagesContainer) return; // Safety check
+            
+            const userMessageElement = document.createElement('div');
+            userMessageElement.className = 'chat-bubble user-bubble self-end';
+            userMessageElement.textContent = userMessage;
+            chatMessagesContainer.prepend(userMessageElement);
+
+            const loadingElement = document.createElement('div');
+            loadingElement.className = 'chat-bubble bot-bubble self-start animate-pulse';
+            loadingElement.textContent = 'جاري التفكير...';
+            chatMessagesContainer.prepend(loadingElement);
+            
+            try {
+                const payload = { contents: chatHistory };
+                const apiKey = "" 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                let response;
+                let result;
+                let backoff = 1000;
+
+                for (let i = 0; i < 3; i++) {
+                    try {
+                        response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (response.status !== 429) {
+                            result = await response.json();
+                            break;
+                        }
+                    } catch (error) {
+                        console.error('Fetch error:', error);
+                    }
+                    await new Promise(resolve => setTimeout(resolve, backoff));
+                    backoff *= 2;
+                }
+
+                chatMessagesContainer.removeChild(loadingElement);
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const botMessage = result.candidates[0].content.parts[0].text;
+                    chatHistory.push({ role: "model", parts: [{ text: botMessage }] });
+                    const botMessageElement = document.createElement('div');
+                    botMessageElement.className = 'chat-bubble bot-bubble self-start';
+                    botMessageElement.textContent = botMessage;
+                    chatMessagesContainer.prepend(botMessageElement);
+                } else {
+                    const errorMessage = "عذراً، حدث خطأ. يرجى المحاولة لاحقًا.";
+                    chatHistory.push({ role: "model", parts: [{ text: errorMessage }] });
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'chat-bubble bot-bubble self-start';
+                    errorElement.textContent = errorMessage;
+                    chatMessagesContainer.prepend(errorElement);
+                }
+            } catch (error) {
+                console.error('Error during chat:', error);
+                chatMessagesContainer.removeChild(loadingElement);
+                const errorMessage = "حدث خطأ أثناء الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.";
+                const errorElement = document.createElement('div');
+                errorElement.className = 'chat-bubble bot-bubble self-start';
+                errorElement.textContent = errorMessage;
+                chatMessagesContainer.prepend(errorElement);
+            }
+        }
+        
+        // دالة لحفظ الطلب في Firestore
+        async function saveOrderToFirestore(customerInfo, cartItems, totalAmount) {
+            if (!db || !userId) {
+                console.error("Firebase is not initialized or user is not authenticated.");
+                throw new Error("Service unavailable.");
+            }
+            try {
+                // Ensure auth is ready before attempting Firestore operation
+                if (!isAuthReady) {
+                    await signIn();
+                }
+                const ordersCollection = collection(db, `artifacts/${appId}/public/data/orders`);
+                const orderData = {
+                    customer: customerInfo,
+                    items: cartItems.map(item => ({ id: item.id, name: item.name, price: item.price })),
+                    total: totalAmount,
+                    userId: userId,
+                    createdAt: new Date().toISOString()
+                };
+                const docRef = await addDoc(ordersCollection, orderData);
+                return docRef.id;
+            } catch (error) {
+                console.error("Error adding document to Firestore:", error);
+                throw new Error("Failed to save order.");
+            }
+        }
+
+        // دالة لمحاكاة عملية الدفع وحفظ الطلب
+        async function simulateStripePayment(customerInfo) {
+            const simulatePaymentBtn = document.getElementById('simulate-payment-btn');
+            const cartTotalSpan = document.getElementById('cart-total');
+            const successModal = document.getElementById('success-modal');
+            const failureModal = document.getElementById('failure-modal');
+            const orderIdDisplay = document.getElementById('order-id-display');
+            const checkoutForm = document.getElementById('checkout-form');
+            if (!simulatePaymentBtn || !cartTotalSpan || !successModal || !failureModal || !orderIdDisplay || !checkoutForm) return;
+
+            simulatePaymentBtn.disabled = true;
+            const originalText = simulatePaymentBtn.textContent;
+            simulatePaymentBtn.textContent = 'جاري معالجة الدفع...';
+
+            try {
+                // محاكاة تأخير الشبكة
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // محاكاة نجاح الدفع بنسبة 90%
+                const isSuccess = Math.random() < 0.9;
+                const totalAmount = parseFloat(cartTotalSpan.textContent);
+
+                if (isSuccess && totalAmount > 0) {
+                    // حفظ الطلب في Firestore
+                    const orderId = await saveOrderToFirestore(customerInfo, cart, totalAmount);
+                    console.log('Payment successful and order saved with ID:', orderId);
+                    
+                    // إخفاء نافذة الدفع وعرض نافذة النجاح
+                    navigateTo('main-content');
+                    if (orderIdDisplay) orderIdDisplay.textContent = orderId;
+                    successModal.classList.remove('hidden');
+                    successModal.classList.add('flex');
+                    
+                    // تفريغ العربة وإعادة ضبط النموذج
+                    cart = [];
+                    renderCart();
+                    checkoutForm.reset();
+                } else {
+                    console.log('Payment failed or cart is empty.');
+                    // إخفاء نافذة الدفع وعرض نافذة الفشل
+                    navigateTo('main-content');
+                    failureModal.classList.remove('hidden');
+                    failureModal.classList.add('flex');
+                }
+            } catch (error) {
+                console.error('Simulated payment error:', error);
+                // في حالة وجود خطأ غير متوقع، عرض نافذة الفشل
+                navigateTo('main-content');
+                failureModal.classList.remove('hidden');
+                failureModal.classList.add('flex');
+            } finally {
+                simulatePaymentBtn.textContent = originalText;
+                simulatePaymentBtn.disabled = false;
+            }
+        }
+
+        // دالة لعرض رسائل التنبيه (تحل محل `alert()`)
+        function showInfoModal(title, message) {
+            const infoModal = document.getElementById('info-modal');
+            const infoModalTitle = document.getElementById('info-modal-title');
+            const infoModalMessage = document.getElementById('info-modal-message');
+            if (!infoModal || !infoModalTitle || !infoModalMessage) return; // Safety check
+            
+            infoModalTitle.textContent = title;
+            infoModalMessage.textContent = message;
+            infoModal.classList.remove('hidden');
+            infoModal.classList.add('flex');
+        }
+
+        // Function to render account dropdown menu
+        function renderAccountDropdown() {
+            const accountDropdown = document.getElementById('account-dropdown');
+            if (!accountDropdown) return;
+            accountDropdown.innerHTML = ''; // Clear previous content
+            const t = translations[currentLang];
+            
+            if (loggedIn) {
+                accountDropdown.innerHTML = `
+                    <div class="px-4 py-2 text-sm text-gray-700 font-bold">${t['account-profile']}</div>
+                    <div class="border-t border-gray-200"></div>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">${t['account-delivery']}</a>
+                    <a href="#" id="toggle-theme-btn" class="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        ${t['account-theme']}
+                        <i id="theme-icon" class="fas fa-sun"></i>
+                    </a>
+                    <a href="#" id="logout-btn" class="block px-4 py-2 text-sm text-red-500 hover:bg-red-100">${t['account-logout']}</a>
+                `;
+            } else {
+                accountDropdown.innerHTML = `
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">${t['account-login']}</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">${t['account-signup']}</a>
+                `;
+            }
+
+            // Add event listeners for new dropdown elements
+            if (loggedIn) {
+                const toggleThemeBtn = document.getElementById('toggle-theme-btn');
+                if (toggleThemeBtn) {
+                    toggleThemeBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        document.body.classList.toggle('dark-mode');
+                        const themeIcon = document.getElementById('theme-icon');
+                        if (themeIcon) {
+                            if (document.body.classList.contains('dark-mode')) {
+                                themeIcon.classList.remove('fa-sun');
+                                themeIcon.classList.add('fa-moon');
+                            } else {
+                                themeIcon.classList.remove('fa-moon');
+                                themeIcon.classList.add('fa-sun');
+                            }
+                        }
+                    });
+                }
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        loggedIn = false;
+                        renderAccountDropdown();
+                    });
+                }
+            }
+        }
+
+
+        // Event Listeners
+        window.addEventListener('load', () => {
+            // ** الإصلاحات هنا: تم نقل جميع تعريفات العناصر ومستمعي الأحداث إلى هذا الجزء **
+            // هذا يضمن أن العناصر موجودة في DOM قبل محاولة التعامل معها.
+            const openCartBtn = document.getElementById('open-cart-btn');
+            const openFavoritesBtn = document.getElementById('open-favorites-btn');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const checkoutForm = document.getElementById('checkout-form');
+            const closeSuccessModalBtn = document.getElementById('close-success-modal-btn');
+            const closeFailureModalBtn = document.getElementById('close-failure-modal-btn');
+            const closeInfoModalBtn = document.getElementById('close-info-modal-btn');
+            const openChatBtn = document.getElementById('open-chat-btn');
+            const chatModal = document.getElementById('chat-modal');
+            const closeChatBtn = document.getElementById('close-chat-btn');
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const productModal = document.getElementById('product-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            const addToFavoritesBtn = document.getElementById('add-to-favorites-btn');
+            const accountBtn = document.getElementById('account-btn');
+            const accountDropdown = document.getElementById('account-dropdown');
+
+            signIn();
+            updateUI('ar'); // Default to Arabic
+            navigateTo('home-page'); // Start on the new home page
+            
+            // مستمعي الأحداث
+            const langArBtn = document.getElementById('lang-ar');
+            if(langArBtn) langArBtn.addEventListener('click', () => updateUI('ar'));
+            const langEnBtn = document.getElementById('lang-en');
+            if(langEnBtn) langEnBtn.addEventListener('click', () => updateUI('en'));
+
+            document.querySelectorAll('.header-category-nav button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const category = e.target.dataset.category;
+                    document.querySelectorAll('.header-category-nav button').forEach(btn => {
+                        btn.classList.remove('text-gray-900', 'border-b-2');
+                        btn.classList.add('text-gray-500');
+                    });
+                    e.target.classList.add('text-gray-900', 'border-b-2');
+                    e.target.classList.remove('text-gray-500');
+                    renderProducts(category);
+                    navigateTo('main-content');
+                });
+            });
+
+            if (openCartBtn) {
+                openCartBtn.addEventListener('click', () => {
+                    renderCart();
+                    navigateTo('cart-page');
+                });
+            }
+            if (openFavoritesBtn) {
+                openFavoritesBtn.addEventListener('click', () => {
+                    renderFavorites();
+                    navigateTo('favorites-page');
+                });
+            }
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', () => {
+                    if (productModal) {
+                        productModal.classList.add('hidden');
+                        productModal.classList.remove('flex');
+                    }
+                });
+            }
+
+            if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', (e) => {
+                    const productId = parseInt(e.target.dataset.productId);
+                    const product = products.find(p => p.id === productId);
+                    if (product) {
+                        cart.push(product);
+                        renderCart();
+                        if (productModal) {
+                            productModal.classList.add('hidden');
+                            productModal.classList.remove('flex');
+                        }
+                        navigateTo('cart-page');
+                    }
+                });
+            }
+
+            if (addToFavoritesBtn) {
+                addToFavoritesBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const productId = parseInt(e.target.dataset.productId);
+                    const product = products.find(p => p.id === productId);
+                    if (product && !favorites.find(item => item.id === productId)) {
+                        favorites.push(product);
+                        renderFavorites();
+                    }
+                    if (productModal) {
+                        productModal.classList.add('hidden');
+                        productModal.classList.remove('flex');
+                    }
+                    navigateTo('favorites-page');
+                });
+            }
+
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', () => {
+                    if (cart.length === 0) {
+                        showInfoModal(translations[currentLang]['info-title'], translations[currentLang]['info-empty-cart']);
+                        return;
+                    }
+                    navigateTo('checkout-page');
+                });
+            }
+
+            if (checkoutForm) {
+                checkoutForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(checkoutForm);
+                    const customerInfo = Object.fromEntries(formData.entries());
+                    simulateStripePayment(customerInfo);
+                });
+            }
+            
+            if (closeSuccessModalBtn) {
+                closeSuccessModalBtn.addEventListener('click', () => {
+                    const successModal = document.getElementById('success-modal');
+                    if (successModal) {
+                        successModal.classList.add('hidden');
+                        successModal.classList.remove('flex');
+                    }
+                    navigateTo('home-page');
+                });
+            }
+            
+            if (closeFailureModalBtn) {
+                closeFailureModalBtn.addEventListener('click', () => {
+                    const failureModal = document.getElementById('failure-modal');
+                    if (failureModal) {
+                        failureModal.classList.add('hidden');
+                        failureModal.classList.remove('flex');
+                    }
+                    navigateTo('home-page');
+                });
+            }
+
+            if (closeInfoModalBtn) {
+                closeInfoModalBtn.addEventListener('click', () => {
+                    const infoModal = document.getElementById('info-modal');
+                    if(infoModal) {
+                        infoModal.classList.add('hidden');
+                        infoModal.classList.remove('flex');
+                    }
+                });
+            }
+
+            if (openChatBtn) {
+                openChatBtn.addEventListener('click', () => {
+                    if (chatModal) {
+                        chatModal.classList.remove('hidden');
+                        chatModal.classList.add('flex');
+                    }
+                });
+            }
+
+            if (closeChatBtn) {
+                closeChatBtn.addEventListener('click', () => {
+                    if (chatModal) {
+                        chatModal.classList.add('hidden');
+                        chatModal.classList.remove('flex');
+                    }
+                });
+            }
+
+            if (chatForm) {
+                chatForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (chatInput) {
+                        const userMessage = chatInput.value.trim();
+                        if (userMessage) {
+                            handleChat(userMessage);
+                            chatInput.value = '';
+                        }
+                    }
+                });
+            }
+
+            // New: Account button and dropdown
+            if (accountBtn) {
+                accountBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (accountDropdown) {
+                        accountDropdown.classList.toggle('show');
+                    }
+                });
+            }
+
+
+            // New: Footer navigation
+            const footerContactLink = document.getElementById('footer-contact-link');
+            if(footerContactLink) footerContactLink.addEventListener('click', (e) => { e.preventDefault(); navigateTo('contact-page'); });
+            const footerPrivacyLink = document.getElementById('footer-privacy-link');
+            if(footerPrivacyLink) footerPrivacyLink.addEventListener('click', (e) => { e.preventDefault(); navigateTo('privacy-page'); });
+            const footerTermsLink = document.getElementById('footer-terms-link');
+            if(footerTermsLink) footerTermsLink.addEventListener('click', (e) => { e.preventDefault(); navigateTo('terms-page'); });
+
+
+            // Hide dropdown when clicking outside
+            window.addEventListener('click', (e) => {
+                if (accountDropdown && accountBtn) {
+                    if (!accountDropdown.contains(e.target) && !accountBtn.contains(e.target)) {
+                        accountDropdown.classList.remove('show');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
